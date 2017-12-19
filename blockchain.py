@@ -13,7 +13,7 @@ class BlockChain(object):
         self.chain = []
         self.current_transactions = []
 
-        # genisis block
+        # genesis block
         self.new_block(previous_hash=1, proof=100)
         # set of nodes in the blockchain decentralized nw
         self.nodes = set()
@@ -145,7 +145,6 @@ class BlockChain(object):
         new_chain = None
         max_length = len(self.chain)
         for node in neighbors:
-            print(node)
             response = requests.get('http://{0}/chain'.format(node))
             if response.status_code == 200:
                 chain = response.json()['chain']
@@ -167,6 +166,7 @@ node_identifier = str(uuid4()).replace('-', '')
 
 # Instantiate the blockchain
 blockchain = BlockChain()
+
 
 @app.route('/mine', methods=['GET'])
 def mine():
@@ -195,6 +195,7 @@ def mine():
 
     return jsonify(response), 200
 
+
 @app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     values = request.get_json()
@@ -208,11 +209,13 @@ def new_transaction():
     response = {'message': 'Transaction will be added to block {0}'.format(index)}
     return jsonify(response), 201
 
+
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {'chain': blockchain.chain,
                 'length': len(blockchain.chain)}
     return jsonify(response), 200
+
 
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
@@ -226,16 +229,17 @@ def register_nodes():
                 'total_nodes': list(blockchain.nodes)}
     return jsonify(response), 201
 
+
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
     replaced = blockchain.resolve_conflicts()
-    if replaces:
+    if replaced:
         response = {'message': 'Our chain was replaced',
                     'new_chain': blockchain.chain}
     else:
-        response = {'message': 'Our chain is autoritative',
+        response = {'message': 'Our chain is authoritative',
                     'new_chain': blockchain.chain}
-    return response, 201
+    return jsonify(response), 201
 
 if __name__ == '__main__':
     port = int(sys.argv[1])
