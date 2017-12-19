@@ -1,9 +1,10 @@
+import sys
 import hashlib
 import json
 from time import time
 from uuid import uuid4
 from flask import Flask, jsonify, request
-from urllib.parse import urlparse
+from urllib import parse as urlparse
 
 class BlockChain(object):
 
@@ -127,7 +128,7 @@ class BlockChain(object):
             if self.hash(last_block) != block['previous_hash']:
                 return False
             # check POW algorithm
-            if not self.valid_proof(last_proof=last_block['proof'], proof=block['proof'])
+            if not self.valid_proof(last_proof=last_block['proof'], proof=block['proof']):
                 return False
             last_block = block
             current_index += 1
@@ -235,4 +236,5 @@ def consensus():
     return response, 201
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = sys.argv[1]
+    app.run(host='0.0.0.0', port=port)
