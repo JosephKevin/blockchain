@@ -4,7 +4,8 @@ import json
 from time import time
 from uuid import uuid4
 from flask import Flask, jsonify, request
-from urllib import parse as urlparse
+import requests
+from urllib.parse import urlparse
 
 class BlockChain(object):
 
@@ -144,7 +145,8 @@ class BlockChain(object):
         new_chain = None
         max_length = len(self.chain)
         for node in neighbors:
-            response = request.get('http://{0}/chain'.format(node))
+            print(node)
+            response = requests.get('http://{0}/chain'.format(node))
             if response.status_code == 200:
                 chain = response.json()['chain']
                 length = response.json()['length']
@@ -236,5 +238,5 @@ def consensus():
     return response, 201
 
 if __name__ == '__main__':
-    port = sys.argv[1]
+    port = int(sys.argv[1])
     app.run(host='0.0.0.0', port=port)
